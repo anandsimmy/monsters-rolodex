@@ -1,26 +1,42 @@
 import React from 'react';
-import logo from './logo.svg';
+import axios from 'axios'
+import { CardList } from './components/card-list-component/card-list-component'
+import { SearchBoxComponent } from './components/search-box-component/search-box-component'
 import './App.css';
 
-function App() {
+class App extends React.Component {
+
+  constructor(){
+    super()
+    this.state={
+      monsters:[],
+      searchFieldValue: ''
+    }
+  }
+
+  componentDidMount(){
+    axios.get('https://jsonplaceholder.typicode.com/users')
+      .then(users => this.setState({ monsters: users.data }))
+  }
+
+  searchField=(e) => {
+    this.setState({
+      searchFieldValue: e.target.value
+    })
+  }
+
+  render(){
+    const { monsters, searchFieldValue }=this.state
+    //filtering out monster names that includes search field value
+    const filteredMonsters= monsters.filter(monster => monster.name.toLowerCase().includes(searchFieldValue.toLowerCase()))
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='App'>
+      <h1>Monsters Rolodex</h1>
+      <SearchBoxComponent placeholder='Search for Monsters' handleChangeFunction={this.searchField}/>
+      <CardList monsters={filteredMonsters} />
     </div>
-  );
+  )
+  }
 }
 
 export default App;
